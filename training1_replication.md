@@ -179,7 +179,7 @@ mysql> SHOW SLAVE STATUS\G
 
 | 項目 | 内容 |
 |------|------|
-| Slave_IO_State | スレーブの現在のステータス\n詳しくは https://dev.mysql.com/doc/refman/5.6/ja/slave-io-thread-states.html |
+| Slave_IO_State | スレーブの現在のステータス<br />詳しくは https://dev.mysql.com/doc/refman/5.6/ja/slave-io-thread-states.html |
 | Slave_IO_Running | スレーブI/Oスレッドが実行中かどうか |
 | Slave_SQL_Running | スレーブSQLスレッドが実行中かどうか |
 | Last_IO_Error | リレーログを処理するときにI/Oスレッドによって登録された最後のエラー |
