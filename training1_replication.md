@@ -123,7 +123,7 @@ $ mysql -uroot < ~/master_dump.db
 マスタのバイナリログファイル名と開始位置を確認する
 
 ```
-$ cat ~/master_dump.db | grep 'CHANGE MASTER TO'
+$ head -n 100 ~/master_dump.db | grep 'CHANGE MASTER TO'
 ```
 
 レプリケーション設定
