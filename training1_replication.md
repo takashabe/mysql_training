@@ -365,6 +365,7 @@ mysql> CHANGE MASTER TO
 
 * レプリケーション全体で個々のトランザクションに付与されるユニークなID
 * UUIDとトランザクションの組を元にしたIDが生成され、バイナリログに記録される
+* マスター接続時にバイナリログをスキャンして開始位置を動的に決定する
 
 ### GTIDを有効にしたレプリケーションのセットアップ
 
@@ -373,8 +374,8 @@ mysql> CHANGE MASTER TO
 ```
 # マスター、スレーブ共に以下の設定が必要
 gtid-mode=on
-enforce-gtid-consistency=on
-log-slave-updates
+enforce-gtid-consistency=1
+log-slave-updates=1
 ```
 
 2. マスターでレプリケーション用ユーザの作成
@@ -418,6 +419,32 @@ mysql> CHANGE MASTER TO
 mysql> START SLAVE;
 ```
 
-### mysqlfailoverを利用した自動フェイルオーバー
+### GTIDの注意点
 
-# TODO: mysqlfailoverの手順を書く
+* マスター接続時にバイナリログをスキャンするので、ファイルサイズは大きくし過ぎないほうが良い
+  * max_binlog_size
+* レプリケーションフィルタリングを使うとGTIDに欠番が出来てしまうので、フィルタリングは併用しない
+* スレーブでバイナリログを吐く必要があるため、 `log_slave_updates` が必須
+
+## Tips
+
+### 遅延レプリケーション
+
+* スレーブ側で意図的に任意時間レプリケーションを遅延させる
+* レプリケーション遅延が発生した場合のアプリケーション挙動の確認、または常に遅延させておきバックアップをリストアせずに以前の状態の調査などに利用される
+* `CHANGE MASTER TO MASTER_DELAY = N;` を実行することでN秒遅延させることが出来る
+
+### レプリケーションフィルタリング
+
+* 任意のスレーブに特定のテーブルのみをレプリケーションさせる
+* レプリケーションされる情報が多すぎる影響で遅延が起こってしまう場合など、転送されるデータを絞ることが有効なケースがある
+* データベース `foo` のみをレプリケーション対象にしたい場合は `--replicate-wild-do-table=foo.%` を設定ファイルに追加することでフィルタリングが可能になる
+
+### mysqlfailover
+
+* MHAなどのサードパーティツールで実現していたHA構成を公式のツールセットで実現可能になる
+* 内部でGTIDを利用しているため、GTIDを有効にしていることが前提
+* MySQL Workbenchに含まれる `mysql-utilities` ツールセット内の `mysqlfailover` を利用する
+* mysqlfailoverを起動しておくだけで、マスターがクラッシュした時点で自動的にフェイルオーバーが行われる
+  * `mysqlfailover --master=root@192.168.195.144:3306 --slaves=root@192.168.195.145:3306 --log=/tmp/failover.log`
+* マスター、スレーブで `report_host` の設定が必要
