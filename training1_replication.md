@@ -348,5 +348,76 @@ mysql> SHOW SLAVE STATUS\G
 この時点で致命的なデータのズレが発生していなければ以下で新マスターを見るようにすればレプリケーションが再開されます。
 
 ```
-# TODO: change master to のやつを書く
+# パラメータは適宜読み替えてください
+mysql> CHANGE MASTER TO
+    ->   MASTER_HOST='localhost',
+    ->   MASTER_USER='repl',
+    ->   MASTER_PASSWORD='password',
+    ->   MASTER_LOG_FILE='foo',
+    ->   MASTER_LOG_POS=bar;
 ```
+
+## Global Transaction ID(GTID)
+
+既存の仕組みではレプリケーションを開始する際にバイナリログのファイル名と開始位置を調べる必要があります。そこでポジションの指定を自動化して運用を楽にするための仕組みがGTIDです。
+
+### GTIDとは
+
+* レプリケーション全体で個々のトランザクションに付与されるユニークなID
+* UUIDとトランザクションの組を元にしたIDが生成され、バイナリログに記録される
+
+### GTIDを有効にしたレプリケーションのセットアップ
+
+1. GTID用の設定を追加
+
+```
+# マスター、スレーブ共に以下の設定が必要
+gtid-mode=on
+enforce-gtid-consistency=on
+log-slave-updates
+```
+
+2. マスターでレプリケーション用ユーザの作成
+
+手順は非GTID環境と同様
+
+```
+# 例
+mysql> CREATE USER 'repl'@'localhost' IDENTIFIED BY 'password';
+mysql> GRANT REPLICATION SLAVE ON *.* TO 'repl'@'localhost';
+```
+
+3. マスターのデータをダンプ
+
+手順は非GTID環境と同様
+※ もしコールドバックアップでデータディレクトリをコピーする方法を取る場合は `auto.cnf` を事前に削除しておく必要がある。UUIDの生成は `auto.cnf` が存在すればそれを元にしてしまうため、UUIDの重複が起きてしまう
+
+```
+$ mysqldump --all-databases --master-data --single-transaction --flush-logs > ~/master_dump.db
+```
+
+4. マスターで取得したダンプをスレーブへリストアする
+
+```
+$ mysql -uroot < ~/master_dump.db
+```
+
+5. スレーブでレプリケーションのセットアップをする
+
+```
+mysql> CHANGE MASTER TO
+    ->   MASTER_HOST='localhost',
+    ->   MASTER_USER='repl',
+    ->   MASTER_PASSWORD='password',
+    ->   MASTER_AUTO_POSITION=1;
+```
+
+6. スレーブでレプリケーションを開始
+
+```
+mysql> START SLAVE;
+```
+
+### mysqlfailoverを利用した自動フェイルオーバー
+
+# TODO: mysqlfailoverの手順を書く
