@@ -139,6 +139,7 @@ $ head -n 100 ~/master_dump.db | grep 'CHANGE MASTER TO'
 mysql> CHANGE MASTER TO
     ->   MASTER_HOST='localhost',
     ->   MASTER_USER='repl',
+    ->   MASTER_PORT=3306,
     ->   MASTER_PASSWORD='password',
     ->   MASTER_LOG_FILE='foo',
     ->   MASTER_LOG_POS=bar;
@@ -352,6 +353,7 @@ mysql> SHOW SLAVE STATUS\G
 mysql> CHANGE MASTER TO
     ->   MASTER_HOST='localhost',
     ->   MASTER_USER='repl',
+    ->   MASTER_PORT=3306,
     ->   MASTER_PASSWORD='password',
     ->   MASTER_LOG_FILE='foo',
     ->   MASTER_LOG_POS=bar;
@@ -394,7 +396,7 @@ mysql> GRANT REPLICATION SLAVE ON *.* TO 'repl'@'localhost';
 ※ もしコールドバックアップでデータディレクトリをコピーする方法を取る場合は `auto.cnf` を事前に削除しておく必要がある。UUIDの生成は `auto.cnf` が存在すればそれを元にしてしまうため、UUIDの重複が起きてしまう
 
 ```
-$ mysqldump --all-databases --master-data --single-transaction --flush-logs > ~/master_dump.db
+$ mysqldump --all-databases --master-data --single-transaction --flush-logs > ~/gtid_master_dump.db
 ```
 
 #### 7.2.4. マスターで取得したダンプをスレーブへリストアする
@@ -409,6 +411,7 @@ $ mysql -uroot < ~/master_dump.db
 mysql> CHANGE MASTER TO
     ->   MASTER_HOST='localhost',
     ->   MASTER_USER='repl',
+    ->   MASTER_PORT=3306,
     ->   MASTER_PASSWORD='password',
     ->   MASTER_AUTO_POSITION=1;
 ```
