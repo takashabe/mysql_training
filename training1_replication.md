@@ -249,6 +249,20 @@ mysql> SHOW SLAVE STATUS\G
 mysql> SELECT * FROM mysql.slave_relay_log_info;
 ```
 
+### 演習
+
+* `4.1. マスターからmysqldumpでデータをコピーする` をベースにしてレプリケーションをセットアップしてみましょう
+* mysqldump後、スレーブを開始する前にマスターにデータを挿入し、スレーブ開始後にデータが同期されていることを確認しましょう
+
+#### mysqld_multi補足
+
+* 全サーバ起動: `mysqld_multi start`
+* 全サーバ停止: `mysqld_multi stop`
+* サーバ1のみ停止: `mysqld_multi stop 1`
+* サーバ1のみ起動: `mysqld_multi start 1`
+* サーバ稼動状態の確認: `mysqld_multi report`
+* 設定ファイル: [mysqld1], [mysqld2] にそれぞれのサーバ固有の設定を書きます
+
 ## 5. レプリケーション障害
 
 何かしらの原因によりレプリケーションが停止することがあります。
@@ -359,6 +373,12 @@ mysql> CHANGE MASTER TO
     ->   MASTER_LOG_POS=bar;
 ```
 
+### 演習
+
+* `6.1. スレーブが1台の場合` をベースにしてマスタースレーブの入れ替えを行ってみましょう
+* mysqldump後、新スレーブを開始する前に新マスターにデータを挿入し、スレーブ開始後にデータが同期されていることを確認しましょう
+  * マスターをスレーブに降格する場合、 `RESET MASTER` , `RESET SLAVE` を用いてレプリケーション情報の消去を行ってから再構築するのが確実です
+
 ## 7. Global Transaction ID(GTID)
 
 既存の仕組みではレプリケーションを開始する際にバイナリログのファイル名と開始位置を調べる必要があります。そこでポジションの指定を自動化して運用を楽にするための仕組みがGTIDです。
@@ -429,6 +449,12 @@ mysql> START SLAVE;
 * レプリケーションフィルタリングを使うとGTIDに欠番が出来てしまうので、フィルタリングは併用しない
 * スレーブでバイナリログを吐く必要があるため、 `log_slave_updates` が必須
 
+### 演習
+
+* `7.2. GTIDを有効にしたレプリケーションのセットアップ` をベースにしてGTIDでのレプリケーションをセットアップしてみましょう
+* mysqldump後、スレーブを開始する前にマスターにデータを挿入し、スレーブ開始後にデータが同期されていることを確認しましょう
+
+
 ## 8. Tips
 
 ### 8.1. 遅延レプリケーション
@@ -451,3 +477,8 @@ mysql> START SLAVE;
 * mysqlfailoverを起動しておくだけで、マスターがクラッシュした時点で自動的にフェイルオーバーが行われる
   * `mysqlfailover --master=root@192.168.195.144:3306 --slaves=root@192.168.195.145:3306 --log=/tmp/failover.log`
 * マスター、スレーブで `report_host` の設定が必要
+
+## 参考リンク
+
+* [MySQL 5.6 リファレンスマニュアル](https://dev.mysql.com/doc/refman/5.6/ja/)
+* [MySQL 5.6 リファレンスマニュアル :: 17 レプリケーション](https://dev.mysql.com/doc/refman/5.6/ja/replication.html)
