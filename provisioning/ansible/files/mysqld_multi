@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Mysql daemon start/stop script.
+#
+# chkconfig: 2345 90 90
+# description: A very fast and reliable SQL database engine.
+
+MYSQLDIR=/usr
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:$MYSQLDIR/bin
+MYSQLID=1,2
+export PATH
+
+case "$1" in
+start)
+echo -n "Starting mysqld: "
+$MYSQLDIR/bin/mysqld_multi start $MYSQLID
+echo
+;;
+stop)
+echo -n "Shutting down mysqld: "
+$MYSQLDIR/bin/mysqld_multi stop $MYSQLID
+echo
+;;
+status)
+$MYSQLDIR/bin/mysqld_multi report $MYSQLID
+;;
+restart)
+$0 stop
+$0 start
+;;
+*)
+echo "Usage: $0 {start|stop|restart|status}"
+exit 1
+esac
+
+exit 0

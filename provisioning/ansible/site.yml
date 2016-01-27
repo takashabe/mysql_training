@@ -1,0 +1,52 @@
+- hosts: all
+  sudo: true
+  user: vagrant
+  tasks:
+    - name: install libselinux-python
+      yum: name=libselinux-python state=present
+
+    - name: install mysql repository
+      yum: name=http://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm state=present
+
+    - name: install mysql server
+      yum: name=mysql-community-server state=present
+
+    - name: replace my.cnf
+      template: src=files/my.cnf dest=/etc/my.cnf owner=root mode=0600
+
+    - name: is install mysql1 data dir already?
+      shell: "[ -f /var/lib/mysql1 ] && echo 'Found' || echo ''"
+      register: installed_mysql1
+
+    - name: is install mysql2 data dir already?
+      shell: "[ -f /var/lib/mysql2 ] && echo 'Found' || echo ''"
+      register: installed_mysql2
+
+    - name: run mysql_install_db for mysql1
+      shell: |
+        mysql_install_db --datadir=/var/lib/mysql1 --user=mysql
+        chown -R mysql:mysql /var/lib/mysql1
+      when: (not installed_mysql1.stdout)
+
+    - name: run mysql_install_db for mysql2
+      shell: |
+        mysql_install_db --datadir=/var/lib/mysql2 --user=mysql
+        chown -R mysql:mysql /var/lib/mysql2
+      when: (not installed_mysql2.stdout)
+
+    - name: create mysqld_multi daemon file
+      template: src=files/mysqld_multi dest=/etc/init.d/mysqld_multi owner=root mode=0755
+
+    - name: create log directory
+      file: path=/var/log/mysql/
+        state=directory
+        owner=root
+        group=root
+        mode=777
+
+    - name: run chkconfig mysqld_multi on
+      service: name=mysqld_multi enabled=yes
+
+    - name: run mysqld_multi
+      sudo: on
+      shell: "mysqld_multi start"
