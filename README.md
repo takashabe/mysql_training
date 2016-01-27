@@ -21,3 +21,13 @@
 #### 内容
 
 * ハイパフォーマンスMySQL(仮)
+
+
+### サーバセットアップ
+
+1. `vagrant`, `virtualbox`, `ansible` が入っていない場合はインストールしておく
+2. `git clone https://github.com/mynet-inc/mysql_training`
+3. `cd mysql_training/provisioning`
+4. `vagrant up`
+5. `cd ansible`
+6. `ansible-playbook -i hosts site.yml`
