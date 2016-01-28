@@ -25,9 +25,13 @@
 
 ### サーバセットアップ
 
-1. `vagrant`, `virtualbox`, `ansible` が入っていない場合はインストールしておく
-2. `git clone https://github.com/mynet-inc/mysql_training`
-3. `cd mysql_training/provisioning`
-4. `vagrant up`
-5. `cd ansible`
-6. `ansible-playbook -i hosts site.yml`
+ワークショップで用意するサーバと同構成のサーバをローカルに立てる事が出来ます。
+`vagrant`, `virtualbox`, `ansible` を利用するのでそれらが入っていない場合は別途インストールしておいてください。
+
+```
+git clone https://github.com/mynet-inc/mysql_training
+cd mysql_training/provisioning
+vagrant up
+cd ansible
+ansible-playbook -i hosts site.yml
+```
