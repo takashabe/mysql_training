@@ -26,7 +26,7 @@
   * スレーブSQLスレッド: スレーブI/Oスレッドによって
     * スレーブI/Oスレッドによって書き込まれたリレーログを読み取り、SQLを実行する
 
-![参考図](https://cacoo.com/diagrams/lx3WurPDpbUBkrir-50BDE.png)
+![参考図](http://i.imgur.com/l1t3dD4.png)
 
 ## 3. レプリケーションの種類
 
