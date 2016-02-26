@@ -10,6 +10,8 @@
 前提としてここではパフォーマンスは `1クエリあたりの応答時間` を指標とする。
 データベースサーバとして最も興味があるであろう、クエリを解釈してデータを返すというタスクのパフォーマンスを見るのに適当だからである。
 
+また特に断りのない限り、本内容はInnoDBを想定したものとする。
+
 ## 2. プロファイリング
 
 何をチューニングすべきか、チューニングした結果どう変わったか、その指標とするためにプロファイリングを用いる。
@@ -139,3 +141,8 @@ $ pt-query-digest --type tcpdump mysql.tcpdump
 ## 7. Tips
 
 * 何か
+
+## 参考メモ
+
+http://naokirin.hatenablog.com/entry/2015/02/07/193609
+http://www.mysql.gr.jp/frame/modules/bwiki/index.php?plugin=attach&refer=matsunobu&openfile=Session-Index.pdf
